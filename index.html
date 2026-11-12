@@ -383,11 +383,66 @@
     -webkit-touch-callout: none;
     touch-action: none;
   }
-  .dpad {
+  /* Circular D-pad — 8 directions (4 cardinal + 4 diagonal) */
+  .dpad-circle {
     position: relative;
-    width: 102px; height: 102px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: rgba(17, 19, 20, 0.55);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
     flex-shrink: 0;
+    touch-action: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
   }
+  .dpad-stick {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 36px; height: 36px;
+    margin: -18px 0 0 -18px;
+    border-radius: 50%;
+    background: rgba(0, 255, 127, 0.15);
+    border: 1px solid var(--neon-dim);
+    pointer-events: none;
+    transition: transform 0.08s ease-out, background 0.08s;
+    box-shadow: 0 0 8px rgba(0,255,127,0.2);
+  }
+  .dpad-circle.active .dpad-stick {
+    background: rgba(0, 255, 127, 0.3);
+    border-color: var(--neon);
+    box-shadow: 0 0 14px rgba(0,255,127,0.5);
+  }
+  /* Cardinal direction arrows (visual only) */
+  .dpad-arrow {
+    position: absolute;
+    color: var(--muted);
+    font-size: 10px;
+    pointer-events: none;
+    line-height: 1;
+  }
+  .dpad-arrow-up    { top: 4px;    left: 50%; transform: translateX(-50%); }
+  .dpad-arrow-down  { bottom: 4px; left: 50%; transform: translateX(-50%); }
+  .dpad-arrow-left  { left: 4px;   top: 50%;  transform: translateY(-50%); }
+  .dpad-arrow-right { right: 4px;  top: 50%;  transform: translateY(-50%); }
+  /* Diagonal indicators (dots at 1:30, 4:30, 7:30, 10:30 positions) */
+  .dpad-diag {
+    position: absolute;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--muted);
+    opacity: 0.4;
+    pointer-events: none;
+  }
+  .dpad-diag-ur { top: 18%;  right: 18%; }
+  .dpad-diag-dr { bottom: 18%; right: 18%; }
+  .dpad-diag-dl { bottom: 18%; left: 18%; }
+  .dpad-diag-ul { top: 18%;  left: 18%; }
+  .dpad-circle.active .dpad-diag.lit { background: var(--neon); opacity: 1; box-shadow: 0 0 6px var(--neon); }
+  .dpad-circle.active .dpad-arrow.lit { color: var(--neon); }
+
+  /* Action buttons */
   .t-btn {
     position: absolute;
     width: 34px; height: 34px;
@@ -418,26 +473,15 @@
     box-shadow: 0 0 14px rgba(255,208,0,0.7);
     border-color: var(--yellow);
   }
-  .dpad-up    { top: 0; left: 34px; }
-  .dpad-down  { bottom: 0; left: 34px; }
-  .dpad-left  { top: 34px; left: 0; }
-  .dpad-right { top: 34px; right: 0; }
-  .dpad-center {
-    top: 34px; left: 34px;
-    background: transparent;
-    border: 1px dashed rgba(93,122,104,0.4);
-    color: var(--muted);
-    font-size: 8px;
-  }
 
   .action-cluster {
     position: relative;
-    width: 110px; height: 102px;
+    width: 110px; height: 120px;
     flex-shrink: 0;
   }
-  .act-c   { top: 0; left: 38px; }            /* C top center */
-  .act-a   { top: 34px; left: 0; }            /* A left */
-  .act-b   { top: 34px; right: 0; }           /* B right */
+  .act-c   { top: 0; left: 38px; }
+  .act-a   { top: 38px; left: 0; }
+  .act-b   { top: 38px; right: 0; }
   .act-start {
     bottom: 0; left: 38px;
     width: 34px;
@@ -533,7 +577,7 @@
       z-index: 20;
       padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
     }
-    .dpad, .action-cluster {
+    .dpad, .dpad-circle, .action-cluster {
       pointer-events: auto;  /* only the button clusters capture touches */
     }
 
@@ -563,17 +607,17 @@
       padding: 0 8px;
       flex-direction: row;
     }
-    /* Smaller controls in landscape */
-    .dpad { width: 90px; height: 90px; }
-    .action-cluster { width: 96px; height: 90px; }
-    .t-btn { width: 30px; height: 30px; font-size: 11px; }
-    .dpad-up, .dpad-down { left: 30px; }
-    .dpad-left, .dpad-right { top: 30px; }
-    .dpad-center { top: 30px; left: 30px; }
-    .act-c { top: 0; left: 33px; }
-    .act-a { top: 30px; left: 0; }
-    .act-b { top: 30px; right: 0; }
-    .act-start { bottom: 0; left: 33px; width: 30px; font-size: 6px; }
+    /* Smaller circular D-pad in landscape */
+    .dpad-circle { width: 100px; height: 100px; }
+    .dpad-stick { width: 30px; height: 30px; margin: -15px 0 0 -15px; }
+    .dpad-arrow { font-size: 9px; }
+    /* Smaller action buttons */
+    .action-cluster { width: 100px; height: 100px; }
+    .t-btn { width: 30px; height: 30px; font-size: 10px; }
+    .act-c { top: 0; left: 35px; }
+    .act-a { top: 35px; left: 0; }
+    .act-b { top: 35px; right: 0; }
+    .act-start { bottom: 0; left: 35px; width: 30px; font-size: 6px; }
   }
 </style>
 </head>
@@ -600,13 +644,17 @@
 
     <!-- TOUCH CONTROLS (mobile only, shown via CSS) -->
     <div class="touch-controls" id="touchControls">
-      <!-- D-PAD -->
-      <div class="dpad">
-        <button class="t-btn dpad-up"    data-sym="up">▲</button>
-        <button class="t-btn dpad-down"  data-sym="down">▼</button>
-        <button class="t-btn dpad-left"  data-sym="left">◀</button>
-        <button class="t-btn dpad-right" data-sym="right">▶</button>
-        <div class="t-btn dpad-center">D</div>
+      <!-- CIRCULAR D-PAD (8 directions: 4 cardinal + 4 diagonal) -->
+      <div class="dpad-circle" id="dpadCircle">
+        <div class="dpad-stick" id="dpadStick"></div>
+        <span class="dpad-arrow dpad-arrow-up">▲</span>
+        <span class="dpad-arrow dpad-arrow-right">▶</span>
+        <span class="dpad-arrow dpad-arrow-down">▼</span>
+        <span class="dpad-arrow dpad-arrow-left">◀</span>
+        <span class="dpad-diag dpad-diag-ur"></span>
+        <span class="dpad-diag dpad-diag-dr"></span>
+        <span class="dpad-diag dpad-diag-dl"></span>
+        <span class="dpad-diag dpad-diag-ul"></span>
       </div>
       <!-- ACTION BUTTONS -->
       <div class="action-cluster">
@@ -1286,20 +1334,185 @@ function attachTouchButton(btn) {
     btn.classList.remove('pressed');
     pressButton(sym, false);
   };
-  // Touch events (primary on mobile)
   btn.addEventListener('touchstart', press, { passive: false });
   btn.addEventListener('touchend', release, { passive: false });
   btn.addEventListener('touchcancel', release, { passive: false });
-  // Mouse events (for desktop testing / hybrid devices)
   btn.addEventListener('mousedown', press);
   btn.addEventListener('mouseup', release);
   btn.addEventListener('mouseleave', (e) => { if (isPressed) release(e); });
-  // Prevent context menu on long press
   btn.addEventListener('contextmenu', (e) => e.preventDefault());
 }
 
+/* ---------- CIRCULAR D-PAD (8 directions) ---------- */
+// Touch anywhere on the circle → calculate angle from center → activate 1 or 2 directions.
+// Cardinal: up/down/left/right. Diagonal: up+left, up+right, down+left, down+right.
+function attachCircularDpad(elem) {
+  const stick = elem.querySelector('.dpad-stick');
+  const arrows = {
+    up:    elem.querySelector('.dpad-arrow-up'),
+    down:  elem.querySelector('.dpad-arrow-down'),
+    left:  elem.querySelector('.dpad-arrow-left'),
+    right: elem.querySelector('.dpad-arrow-right')
+  };
+  const diags = {
+    ur: elem.querySelector('.dpad-diag-ur'),
+    dr: elem.querySelector('.dpad-diag-dr'),
+    dl: elem.querySelector('.dpad-diag-dl'),
+    ul: elem.querySelector('.dpad-diag-ul')
+  };
+  let active = new Set();  // currently pressed directions
+  let touchId = null;      // track the specific touch
+
+  // Calculate which directions to activate based on touch position
+  function getDirections(x, y) {
+    const r = elem.getBoundingClientRect();
+    const cx = r.left + r.width / 2;
+    const cy = r.top + r.height / 2;
+    const dx = x - cx;
+    const dy = y - cy;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    const radius = r.width / 2;
+    // Dead zone in center (15% of radius) — no direction if too close to center
+    if (dist < radius * 0.15) return { dirs: [], dx: 0, dy: 0, dist: 0 };
+
+    // Normalize stick offset (max 35% of radius)
+    const maxOffset = radius * 0.35;
+    const sx = (dx / dist) * Math.min(dist, maxOffset);
+    const sy = (dy / dist) * Math.min(dist, maxOffset);
+
+    // Angle: 0° = right, 90° = up (screen Y inverted), 180° = left, 270° = down
+    // Using atan2(-dy, dx) because screen Y goes down
+    const angle = Math.atan2(-dy, dx) * 180 / Math.PI; // -180..180
+
+    const dirs = [];
+    // 8 sectors of 45° each
+    const a = ((angle % 360) + 360) % 360; // normalize to 0..360
+    if (a >= 337.5 || a < 22.5)       dirs.push('right');
+    else if (a >= 22.5  && a < 67.5)  { dirs.push('up'); dirs.push('right'); }
+    else if (a >= 67.5  && a < 112.5) dirs.push('up');
+    else if (a >= 112.5 && a < 157.5) { dirs.push('up'); dirs.push('left'); }
+    else if (a >= 157.5 && a < 202.5) dirs.push('left');
+    else if (a >= 202.5 && a < 247.5) { dirs.push('down'); dirs.push('left'); }
+    else if (a >= 247.5 && a < 292.5) dirs.push('down');
+    else if (a >= 292.5 && a < 337.5) { dirs.push('down'); dirs.push('right'); }
+
+    return { dirs, dx: sx, dy: sy, dist };
+  }
+
+  // Update pressed directions: release old, press new
+  function updateDirections(newDirs) {
+    // Release directions no longer active
+    active.forEach(d => {
+      if (!newDirs.includes(d)) {
+        pressButton(d, false);
+        active.delete(d);
+        if (arrows[d]) arrows[d].classList.remove('lit');
+      }
+    });
+    // Press new directions
+    newDirs.forEach(d => {
+      if (!active.has(d)) {
+        pressButton(d, true);
+        active.add(d);
+        if (arrows[d]) arrows[d].classList.add('lit');
+      }
+    });
+    // Light up diagonal indicators
+    Object.values(diags).forEach(el => el && el.classList.remove('lit'));
+    if (active.has('up') && active.has('right'))    diags.ur && diags.ur.classList.add('lit');
+    if (active.has('down') && active.has('right'))  diags.dr && diags.dr.classList.add('lit');
+    if (active.has('down') && active.has('left'))   diags.dl && diags.dl.classList.add('lit');
+    if (active.has('up') && active.has('left'))     diags.ul && diags.ul.classList.add('lit');
+  }
+
+  // Move the visual stick toward touch direction
+  function moveStick(dx, dy) {
+    if (stick) {
+      stick.style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
+    }
+  }
+  function resetStick() {
+    if (stick) stick.style.transform = 'translate(0, 0)';
+  }
+
+  function start(x, y) {
+    elem.classList.add('active');
+    const res = getDirections(x, y);
+    updateDirections(res.dirs);
+    moveStick(res.dx, res.dy);
+  }
+  function move(x, y) {
+    const res = getDirections(x, y);
+    updateDirections(res.dirs);
+    moveStick(res.dx, res.dy);
+  }
+  function end() {
+    elem.classList.remove('active');
+    updateDirections([]);
+    resetStick();
+  }
+
+  // Touch events
+  elem.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if (touchId !== null) return;
+    const t = e.changedTouches[0];
+    touchId = t.identifier;
+    start(t.clientX, t.clientY);
+  }, { passive: false });
+
+  elem.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    if (touchId === null) return;
+    for (const t of e.changedTouches) {
+      if (t.identifier === touchId) {
+        move(t.clientX, t.clientY);
+        break;
+      }
+    }
+  }, { passive: false });
+
+  const endTouch = (e) => {
+    e.preventDefault();
+    if (touchId === null) return;
+    for (const t of e.changedTouches) {
+      if (t.identifier === touchId) {
+        touchId = null;
+        end();
+        break;
+      }
+    }
+  };
+  elem.addEventListener('touchend', endTouch, { passive: false });
+  elem.addEventListener('touchcancel', endTouch, { passive: false });
+
+  // Mouse events (desktop testing)
+  let mouseDown = false;
+  elem.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    mouseDown = true;
+    start(e.clientX, e.clientY);
+  });
+  elem.addEventListener('mousemove', (e) => {
+    if (!mouseDown) return;
+    move(e.clientX, e.clientY);
+  });
+  const endMouse = () => {
+    if (!mouseDown) return;
+    mouseDown = false;
+    end();
+  };
+  elem.addEventListener('mouseup', endMouse);
+  elem.addEventListener('mouseleave', endMouse);
+  elem.addEventListener('contextmenu', (e) => e.preventDefault());
+}
+
 function initTouchControls() {
+  // Action buttons (A/B/C/Start)
   document.querySelectorAll('.t-btn[data-sym]').forEach(attachTouchButton);
+  // Circular D-pad
+  const dpad = document.getElementById('dpadCircle');
+  if (dpad) attachCircularDpad(dpad);
 }
 
 /* ---------- MOBILE SIDEBAR TOGGLE ---------- */
