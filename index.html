@@ -371,10 +371,8 @@
   .touch-controls {
     display: none;
     justify-content: space-between;
-    align-items: center;
-    padding: 8px 12px;
-    background: var(--bg-deep);
-    border-top: 1px solid var(--border);
+    align-items: flex-end;
+    padding: 10px 14px;
     gap: 10px;
     user-select: none;
     -webkit-user-select: none;
@@ -383,63 +381,67 @@
   }
   .dpad {
     position: relative;
-    width: 144px; height: 144px;
+    width: 132px; height: 132px;
     flex-shrink: 0;
   }
   .t-btn {
     position: absolute;
-    width: 46px; height: 46px;
-    background: var(--bg-panel);
+    width: 42px; height: 42px;
+    background: rgba(17, 19, 20, 0.72);
     border: 1px solid var(--border);
     color: var(--text);
-    border-radius: 8px;
+    border-radius: 50%;
     font-family: inherit;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 700;
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     touch-action: manipulation;
-    transition: transform 0.05s, background 0.05s;
+    transition: transform 0.05s, background 0.05s, box-shadow 0.05s;
     -webkit-tap-highlight-color: transparent;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
   }
   .t-btn.pressed {
     background: var(--neon);
     color: #000;
-    transform: scale(0.92);
-    box-shadow: 0 0 12px rgba(0,255,127,0.5);
+    transform: scale(0.88);
+    box-shadow: 0 0 16px rgba(0,255,127,0.7);
+    border-color: var(--neon);
   }
   .t-btn.pressed.yellow {
     background: var(--yellow);
-    box-shadow: 0 0 12px rgba(255,208,0,0.5);
+    box-shadow: 0 0 16px rgba(255,208,0,0.7);
+    border-color: var(--yellow);
   }
-  .dpad-up    { top: 0; left: 49px; }
-  .dpad-down  { bottom: 0; left: 49px; }
-  .dpad-left  { top: 49px; left: 0; }
-  .dpad-right { top: 49px; right: 0; }
+  .dpad-up    { top: 0; left: 45px; }
+  .dpad-down  { bottom: 0; left: 45px; }
+  .dpad-left  { top: 45px; left: 0; }
+  .dpad-right { top: 45px; right: 0; }
   .dpad-center {
-    top: 49px; left: 49px;
+    top: 45px; left: 45px;
     background: transparent;
-    border: 1px dashed var(--border);
+    border: 1px dashed rgba(93,122,104,0.5);
     color: var(--muted);
-    font-size: 10px;
+    font-size: 9px;
   }
 
   .action-cluster {
     position: relative;
-    width: 160px; height: 144px;
+    width: 140px; height: 132px;
     flex-shrink: 0;
   }
-  .act-c   { top: 0; left: 57px; }            /* C top center */
-  .act-a   { top: 49px; left: 5px; }          /* A left */
-  .act-b   { top: 49px; right: 5px; }         /* B right */
+  .act-c   { top: 0; left: 49px; }            /* C top center */
+  .act-a   { top: 45px; left: 0; }            /* A left */
+  .act-b   { top: 45px; right: 0; }           /* B right */
   .act-start {
-    bottom: 0; left: 57px;
-    width: 60px;
-    background: var(--bg-panel);
+    bottom: 0; left: 49px;
+    width: 42px;
+    background: rgba(17, 19, 20, 0.72);
     color: var(--neon);
     border-color: var(--neon-dim);
-    font-size: 11px;
-    letter-spacing: 1px;
+    font-size: 9px;
+    letter-spacing: 0.5px;
   }
   .act-a { color: var(--neon); border-color: var(--neon-dim); }
   .act-b { color: var(--yellow); border-color: #6b5a00; }
@@ -456,16 +458,16 @@
   /* === MOBILE LAYOUT === */
   @media (max-width: 900px), (hover: none) and (pointer: coarse) {
     html, body { height: 100vh; height: 100dvh; overflow: hidden; }
-    header { padding: 6px 10px; flex-shrink: 0; }
-    header h1 { font-size: 14px; letter-spacing: 1px; }
+    header { padding: 5px 10px; flex-shrink: 0; background: rgba(8,10,9,0.95); }
+    header h1 { font-size: 13px; letter-spacing: 1px; }
     header .sub { display: none; }
     .menu-toggle { display: flex; align-items: center; justify-content: center; }
 
     main {
       grid-template-columns: 1fr;
-      grid-template-rows: 1fr auto;
-      padding: 6px;
-      gap: 6px;
+      grid-template-rows: 1fr;  /* ONLY game — controls overlay on top */
+      padding: 0;
+      gap: 0;
       min-height: 0;
       overflow: hidden;
     }
@@ -475,16 +477,16 @@
       max-height: none;
       margin: 0;
       min-height: 0;
+      border: none;
+      border-radius: 0;
     }
     #game {
       width: 100%;
       height: 100%;
     }
     #game canvas {
-      max-width: 100%;
-      max-height: 100%;
-      width: auto !important;
-      height: auto !important;
+      width: 100%;
+      height: 100%;
     }
     .focus-hint { font-size: 11px; padding: 10px 14px; }
     .focus-hint small { font-size: 8px; }
@@ -512,9 +514,18 @@
     }
     .sidebar-backdrop.show { display: block; }
 
+    /* Touch controls = overlay on top of game */
     .touch-controls {
       display: flex;
-      grid-row: 2;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: transparent;
+      pointer-events: none;  /* let touches pass through to game except on buttons */
+      z-index: 20;
+      padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+    }
+    .dpad, .action-cluster {
+      pointer-events: auto;  /* only the button clusters capture touches */
     }
 
     /* hide EmulatorJS's own virtual gamepad — wrong button IDs */
@@ -822,12 +833,52 @@ function launchEmulator() {
   window.EJS_ready = function() {
     hideOverlay();
     focusGame();
-    appendChat('SYSTEM', 'Гра готова. Натисніть Enter (Start) для початку. В меню FIFA 97 оберіть Exhibition → vs CPU або 2P.', 'sys');
+    appendChat('SYSTEM', 'Гра готова. START для початку. В меню FIFA 97: Friendly → 2 Player.', 'sys');
     if (state.isHost === true) {
       const canvas = document.querySelector('#game canvas');
       if (canvas) startMediaNegotiation();
     }
   };
+
+  // On mobile (portrait), force the canvas to 4:3 aspect ratio so the game
+  // fills it completely (no black bars). EmulatorJS sets canvas to parent size
+  // (e.g., 390x759 portrait), causing the 4:3 game to render at top with black below.
+  // We override canvas.width/height to 4:3 so the game fills the whole canvas.
+  function fixCanvasAspect() {
+    if (window.innerWidth > 900) return; // desktop: leave as-is
+    const canvas = document.querySelector('#game canvas');
+    if (!canvas) return;
+    const parent = canvas.parentElement;
+    if (!parent) return;
+    const pw = parent.clientWidth;
+    const ph = parent.clientHeight;
+    if (!pw || !ph) return;
+    // Compute 4:3 size that fits within parent (fills width on portrait)
+    let cw, ch;
+    if (pw / ph > 4/3) {
+      ch = ph;
+      cw = Math.round(ph * 4/3);
+    } else {
+      cw = pw;
+      ch = Math.round(pw * 3/4);
+    }
+    // Set CSS display size + center
+    canvas.style.width = cw + 'px';
+    canvas.style.height = ch + 'px';
+    canvas.style.position = 'absolute';
+    canvas.style.left = '50%';
+    canvas.style.top = '50%';
+    canvas.style.transform = 'translate(-50%, -50%)';
+    // Set internal buffer to match (so 4:3 game fills it without black bars)
+    if (canvas.width !== cw || canvas.height !== ch) {
+      canvas.width = cw;
+      canvas.height = ch;
+    }
+  }
+  // Re-run periodically since EmulatorJS may reset canvas size
+  setInterval(fixCanvasAspect, 1000);
+  window.addEventListener('resize', fixCanvasAspect);
+  window.addEventListener('orientationchange', () => setTimeout(fixCanvasAspect, 300));
 
   const s = document.createElement('script');
   s.src = EJS_BASE + 'loader.js';
