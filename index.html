@@ -544,11 +544,36 @@
     }
   }
 
-  /* landscape phone: keep controls below */
-  @media (max-width: 900px) and (orientation: landscape) and (max-height: 500px) {
-    .game-stage { max-height: 70vh; }
-    .touch-controls { padding: 4px 12px; }
-    .dpad, .action-cluster { transform: scale(0.85); }
+  /* === LANDSCAPE MOBILE === */
+  /* In landscape: game fills screen (4:3 fits naturally), controls on sides */
+  @media (max-width: 1100px) and (orientation: landscape) and (max-height: 500px) {
+    header { padding: 2px 8px; }
+    header h1 { font-size: 11px; letter-spacing: 0.5px; }
+    .menu-toggle { width: 28px; height: 28px; font-size: 14px; }
+
+    /* Game fills entire screen */
+    main { padding: 0; }
+    .game-stage { border: none; border-radius: 0; }
+
+    /* Touch controls: overlay on left and right sides (full height) */
+    .touch-controls {
+      top: 0; bottom: 0;
+      height: 100%;
+      align-items: center;
+      padding: 0 8px;
+      flex-direction: row;
+    }
+    /* Smaller controls in landscape */
+    .dpad { width: 90px; height: 90px; }
+    .action-cluster { width: 96px; height: 90px; }
+    .t-btn { width: 30px; height: 30px; font-size: 11px; }
+    .dpad-up, .dpad-down { left: 30px; }
+    .dpad-left, .dpad-right { top: 30px; }
+    .dpad-center { top: 30px; left: 30px; }
+    .act-c { top: 0; left: 33px; }
+    .act-a { top: 30px; left: 0; }
+    .act-b { top: 30px; right: 0; }
+    .act-start { bottom: 0; left: 33px; width: 30px; font-size: 6px; }
   }
 </style>
 </head>
@@ -850,10 +875,11 @@ function launchEmulator() {
     adjustGameStretch();
   };
 
-  // On mobile: stretch the game vertically to fill the screen.
-  // EmulatorJS renders the 4:3 game at the TOP of the canvas, leaving black below.
-  // We scale the canvas vertically so the game portion fills the entire screen.
-  // scaleY = screen_height / game_height (where game_height = screen_width * 3/4 for 4:3)
+  // On mobile: stretch the game to fill the screen.
+  // - PORTRAIT: game is 4:3, renders at top of canvas (390x293 within 390x759).
+  //   We scale Y to stretch the game to fill the full height.
+  // - LANDSCAPE: game fills height naturally (4:3 fits landscape better).
+  //   No stretch needed — just fill the screen.
   function adjustGameStretch() {
     if (window.innerWidth > 900) {
       // desktop: no stretch
@@ -868,9 +894,13 @@ function launchEmulator() {
     const pw = parent.clientWidth;
     const ph = parent.clientHeight;
     if (!pw || !ph) return;
-    // Game is 4:3, rendered at top of canvas filling the width
-    // gameHeight = pw * 3/4 (for 4:3 aspect)
-    // To fill ph, scaleY = ph / gameHeight = ph / (pw * 3/4) = (ph * 4) / (pw * 3)
+    // Landscape (wider than tall): no stretch, game fills naturally
+    if (pw > ph) {
+      canvas.style.transform = 'none';
+      return;
+    }
+    // Portrait: stretch Y so 4:3 game fills the tall screen
+    // gameHeight = pw * 3/4, scaleY = ph / gameHeight = (ph * 4) / (pw * 3)
     const scaleY = (ph * 4) / (pw * 3);
     canvas.style.transform = 'scale(1, ' + scaleY + ')';
   }
